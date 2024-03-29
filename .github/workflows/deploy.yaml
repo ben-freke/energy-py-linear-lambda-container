@@ -21,6 +21,9 @@ jobs:
 
   DeployToDev:
     name: Verify Check
+    needs:
+      - BuildContainer
+    if: always()
     uses: ./.github/workflows/deploy-workflow.yaml
     permissions:
       id-token: write
