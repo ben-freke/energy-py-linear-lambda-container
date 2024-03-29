@@ -1,0 +1,26 @@
+[tool.black]
+line-length = 120
+
+[tool.isort]
+profile = "black"
+line_length = 120
+
+[tool.pytest.ini_options]
+testpaths = [
+    "tests",
+]
+pythonpath = [
+    "src",
+]
+addopts = """\
+    --cov src \
+    --cov-fail-under 100 \
+    --cov-branch \
+    --cov-report term-missing \
+    --verbose
+"""
+
+[tool.coverage.report]
+omit = [
+    "src/run_local.py",
+]

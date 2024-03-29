@@ -1,0 +1,43 @@
+AWSTemplateFormatVersion: 2010-09-09
+Transform: AWS::Serverless-2016-10-31
+
+Parameters:
+  ImageVersion:
+    Type: String
+    Description: The version of the image to deploy
+
+  ExcludeLambda:
+    Type: String
+    Description: Whether to exclude the Lambda function from the stack
+    AllowedPattern: '^(true|false)$'
+    Default: false
+
+Conditions:
+    # This is used to conditionally create the Lambda function when
+    # the application is first deployed
+    ExcludeLambda: !Equals [!Ref ExcludeLambda, 'true']
+
+Resources:
+
+  EcrRepo:
+    Type: AWS::ECR::Repository
+    Properties:
+      ImageTagMutability: IMMUTABLE
+      RepositoryName: optimisation-function
+
+  Lambda:
+    Condition: ExcludeLambda
+    Type: AWS::Serverless::Function
+    Properties:
+      ImageUri: !Sub "${EcrRepo.RepositoryUri}:${ImageVersion}"
+      PackageType: Image
+      Tracing: Active
+      AutoPublishAlias: live
+      Timeout: 300
+
+  LambdaLogGroup:
+    Condition: ExcludeLambda
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub '/aws/lambda/${Lambda}'
+      RetentionInDays: 30

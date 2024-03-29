@@ -1,0 +1,62 @@
+name: Deploy SAM Application
+
+on:
+  workflow_call:
+    inputs:
+      aws-account-id:
+        required: true
+        type: string
+      environment:
+        required: true
+        type: string
+      container-version:
+        required: true
+        type: string
+      registry-name:
+        required: true
+        type: string
+
+jobs:
+  deploy:
+
+    name: Deploy
+    runs-on: ubuntu-latest
+
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::${{ inputs.aws-account-id }}:role/GitHubActionsRole
+          role-session-name: optimisation-function
+          aws-region: eu-west-2
+
+      - name: Check if ECR repository exists
+        id: check-repo
+        run: |
+          if aws ecr describe-repositories --repository-names ${{ inputs.registry-name }} 2>/dev/null; then
+            echo "Repository exists. Proceeding with the workflow."
+            echo "REPO_EXISTS=true" >> $GITHUB_ENV
+          else
+            echo "Repository does not exist. Exiting workflow."
+            echo "REPO_EXISTS=false" >> $GITHUB_ENV
+            exit 1
+        shell: bash
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: Build, tag, and push image to Amazon ECR
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: ${{ inputs.container-version }}
+        run: |
+          docker build -t $ECR_REGISTRY/${{ inputs.registry-name }}:${{ inputs.container-version }} ./src
+          docker push $ECR_REGISTRY/${{ inputs.registry-name }}:${{ inputs.container-version }}

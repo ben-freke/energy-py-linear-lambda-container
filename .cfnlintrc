@@ -1,0 +1,4 @@
+templates:
+  - ./template.yaml
+regions:
+  - eu-west-1
