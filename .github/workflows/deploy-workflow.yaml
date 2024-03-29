@@ -1,0 +1,41 @@
+name: Deploy SAM Application
+
+on:
+  workflow_call:
+    inputs:
+      aws-account-id:
+        required: true
+        type: string
+      environment:
+        required: true
+        type: string
+
+jobs:
+  deploy:
+
+    name: Deploy
+    runs-on: ubuntu-latest
+
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Install SAM CLI
+        run: pip install aws-sam-cli
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::${{ inputs.aws-account-id }}:role/GitHubActionsRole
+          role-session-name: solar-battery-energy-trader
+          aws-region: eu-west-2
+
+      - name: Build SAM Application
+        run: sam build --template-file template.yaml
+
+      - name: Deploy SAM Application
+        run: sam deploy --no-fail-on-empty-changeset --no-confirm-changeset --stack-name home-control-${{ inputs.environment }} --capabilities CAPABILITY_IAM CAPABILITY_AUTO_EXPAND
