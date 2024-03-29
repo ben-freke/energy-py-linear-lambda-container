@@ -10,6 +10,9 @@ jobs:
   BuildContainer:
     name: Verify Check
     uses: ./.github/workflows/build-container.yaml
+    permissions:
+      id-token: write
+      contents: read
     with:
       aws-account-id: '706717726402'
       environment: dev
