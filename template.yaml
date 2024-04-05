@@ -1,21 +1,9 @@
 AWSTemplateFormatVersion: 2010-09-09
 Transform: AWS::Serverless-2016-10-31
 
-Parameters:
-  ImageVersion:
-    Type: String
-    Description: The version of the image to deploy
-    Default: ''
-
-Conditions:
-    # This is used to conditionally create the Lambda function when
-    # the application is first deployed
-    ExcludeLambda: !Equals [!Ref ImageVersion, '']
-
 Resources:
 
   Lambda:
-    Condition: ExcludeLambda
     Type: AWS::Serverless::Function
     Properties:
       PackageType: Image
@@ -28,8 +16,14 @@ Resources:
       DockerTag: "v0.0.1"
 
   LambdaLogGroup:
-    Condition: ExcludeLambda
     Type: AWS::Logs::LogGroup
     Properties:
       LogGroupName: !Sub '/aws/lambda/${Lambda}'
       RetentionInDays: 30
+
+Outputs:
+    LambdaArn:
+        Description: "Lambda Function ARN"
+        Value: !GetAtt Lambda.Arn
+        Export:
+          Name: OptimiserLambdaArn
