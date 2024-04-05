@@ -38,4 +38,4 @@ jobs:
         run: sam build --template-file template.yaml
 
       - name: Deploy SAM Application
-        run: sam deploy --no-fail-on-empty-changeset --no-confirm-changeset --stack-name home-control-${{ inputs.environment }} --capabilities CAPABILITY_IAM CAPABILITY_AUTO_EXPAND --resolve-image-repos
+        run: sam deploy --no-fail-on-empty-changeset --no-confirm-changeset --stack-name ${{ github.repository }}-${{ inputs.environment }} --capabilities CAPABILITY_IAM CAPABILITY_AUTO_EXPAND --resolve-image-repos
