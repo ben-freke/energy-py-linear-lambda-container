@@ -14,21 +14,18 @@ Conditions:
 
 Resources:
 
-  EcrRepo:
-    Type: AWS::ECR::Repository
-    Properties:
-      ImageTagMutability: IMMUTABLE
-      RepositoryName: optimisation-function
-
   Lambda:
     Condition: ExcludeLambda
     Type: AWS::Serverless::Function
     Properties:
-      ImageUri: !Sub "${EcrRepo.RepositoryUri}:${ImageVersion}"
       PackageType: Image
       Tracing: Active
       AutoPublishAlias: live
       Timeout: 300
+    Metadata:
+      Dockerfile: dockerfile
+      DockerContext: ./src
+      DockerTag: "v0.0.1"
 
   LambdaLogGroup:
     Condition: ExcludeLambda

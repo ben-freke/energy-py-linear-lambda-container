@@ -8,3 +8,6 @@ confirm_changeset = true
 capabilities = "CAPABILITY_IAM"
 disable_rollback = true
 image_repositories = []
+parameter_overrides = [
+    "ImageVersion=''"
+]
