@@ -4,11 +4,14 @@ on:
   push:
     branches:
       - main  # Trigger the workflow on push to the main branch
+    paths:
+      - src/**
+
 
 jobs:
 
   BuildContainer:
-    name: Verify Check
+    name: Build Container
     uses: ./.github/workflows/build-container.yaml
     permissions:
       id-token: write
@@ -20,29 +23,16 @@ jobs:
       registry-name: optimisation-function
 
   DeployToDev:
-    name: Verify Check
+    name: Deploy to Development
+    uses: ./.github/workflows/deploy-workflow.yaml
     needs:
       - BuildContainer
-    if: always()
-    uses: ./.github/workflows/deploy-workflow.yaml
     permissions:
       id-token: write
       contents: read
     with:
       aws-account-id: '706717726402'
       environment: dev
-
-#  DeployToDev:
-#    name: Deploy to Development
-#    uses: ./.github/workflows/deploy-workflow.yaml
-#    needs:
-#      - VerifyCheck
-#    permissions:
-#      id-token: write
-#      contents: read
-#    with:
-#      aws-account-id: '706717726402'
-#      environment: dev
 
 #  DeployToStaging:
 #    name: Deploy to Staging

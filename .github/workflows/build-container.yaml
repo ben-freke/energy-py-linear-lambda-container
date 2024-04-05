@@ -48,12 +48,14 @@ jobs:
             echo "REPO_EXISTS=false" >> $GITHUB_ENV
             exit 1
         shell: bash
+        continue-on-error: true
 
       - name: Login to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
 
       - name: Build, tag, and push image to Amazon ECR
+        continue-on-error: true
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           IMAGE_TAG: ${{ inputs.container-version }}

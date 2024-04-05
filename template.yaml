@@ -5,18 +5,12 @@ Parameters:
   ImageVersion:
     Type: String
     Description: The version of the image to deploy
-    Default: v0.0.1
-
-  ExcludeLambda:
-    Type: String
-    Description: Whether to exclude the Lambda function from the stack
-    AllowedPattern: '^(true|false)$'
-    Default: true
+    Default: ''
 
 Conditions:
     # This is used to conditionally create the Lambda function when
     # the application is first deployed
-    ExcludeLambda: !Equals [!Ref ExcludeLambda, 'true']
+    ExcludeLambda: !Equals [!Ref ImageVersion, '']
 
 Resources:
 
